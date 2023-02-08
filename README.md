@@ -42,5 +42,10 @@ log_data/2018/11/2018-11-12-events.json
 log_data/2018/11/2018-11-13-events.json
 ```
 
+And below is an example of what the data in a log file, 2018-11-12-events.json, looks like.
+
+![Log Data Image](https://user-images.githubusercontent.com/24963911/217435030-6e93f449-4689-466a-8f9b-4478cf604292.png)
+
 ### Log_Json Dataset
+The content of the third dataset, which contains meta information about the log dataset, is shown below.
 
