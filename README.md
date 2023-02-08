@@ -49,3 +49,4 @@ And below is an example of what the data in a log file, 2018-11-12-events.json, 
 ### Log_Json Dataset
 The content of the third dataset, which contains meta information about the log dataset, is shown below.
 
+![Log Json Path](https://user-images.githubusercontent.com/24963911/217435680-a5f90d3c-b6ee-4ad2-82a2-c684572c7173.png)
