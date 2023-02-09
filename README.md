@@ -7,10 +7,10 @@ A music streaming startup, Sparkify, has grown their user base and song database
 
 As their data engineer, you are tasked with building an ETL pipeline that extracts their data from S3, stages them in Redshift, and transforms data into a set of dimensional tables for their analytics team to continue finding insights into what songs their users are listening to.
 
-<!-- ![AWS S3 to Redshift ETL ARchitecture](https://user-images.githubusercontent.com/24963911/217428418-7a836be4-809f-46db-8f51-6c33b92f37a0.png) -->
+![AWS S3 to Redshift ETL ARchitecture](https://user-images.githubusercontent.com/24963911/217428418-7a836be4-809f-46db-8f51-6c33b92f37a0.png)
 
 ## Project Dataset
-There are three datasets in S3 (Song, log, and log_json datasets), which are required to extract, transform, and then load into Redshift. 
+As shown in the image above, there are three datasets in S3 (Song, log, and log_json datasets), which are required to extract, transform, and then load into Redshift. 
 
 ### Song Dataset
 The first dataset is a subset of real data from the [Million Song Dataset](http://millionsongdataset.com/). Each file is in JSON format and contains metadata about a song and the artist of that song. The files are partitioned by the first three letters of each song's track ID. For example, here are file paths to two files in this dataset.
@@ -47,6 +47,10 @@ And below is an example of what the data in a log file, 2018-11-12-events.json, 
 ![Log Data Image](https://user-images.githubusercontent.com/24963911/217435030-6e93f449-4689-466a-8f9b-4478cf604292.png)
 
 ### Log_Json Dataset
-The content of the third dataset, which contains meta information about the log dataset, is shown below.
+The content of the third dataset, which contains meta information about the log dataset, is shown below. This file contains the meta information that is required by AWS to correctly load the lod dataset.
 
 ![Log Json Path](https://user-images.githubusercontent.com/24963911/217435680-a5f90d3c-b6ee-4ad2-82a2-c684572c7173.png)
+
+## Project Steps
+There are three main steps to design and then implement this project.
+1. Provision computing resources with ***Infrasctructure as Code*** paradigm
