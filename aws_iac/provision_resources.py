@@ -1,3 +1,4 @@
+import asyncio
 from time import sleep
 import pandas as pd
 import boto3
@@ -5,127 +6,84 @@ import json
 import psycopg2
 import configparser
 
+from provision_resource_helper import create_aws_client, create_aws_resource, create_iam_role
 
-# Loads datawarehouse credentials that are required to
-# provision the computing resource in AWS Redshift datawarehouse.
-# Also, the credentials allows the project to interact with
-# the databases in the Redshift clusters.
-
-# open the configuration file so that the credntials values
-# can be extracted to initialize the corresponding variables
-    
-config = configparser.ConfigParser()
-config.read_file(open('dwh.cfg'))
-
+# Datawarehouse parameters
 # Access Keys
-KEY                    = config.get('AWS','KEY')
-SECRET                 = config.get('AWS','SECRET')
+KEY                     = ''
+SECRET                  = ''
 
 # Cluster Details
-DWH_CLUSTER_TYPE       = config.get("DWH","DWH_CLUSTER_TYPE")
-DWH_NUM_NODES          = config.get("DWH","DWH_NUM_NODES")
-DWH_NODE_TYPE          = config.get("DWH","DWH_NODE_TYPE")
-DWH_CLUSTER_IDENTIFIER = config.get("DWH","DWH_CLUSTER_IDENTIFIER")
-DWH_IAM_ROLE_NAME      = config.get("DWH", "DWH_IAM_ROLE_NAME")
+DWH_CLUSTER_TYPE        = ''
+DWH_NUM_NODES           = ''
+DWH_NODE_TYPE           = ''
+DWH_CLUSTER_IDENTIFIER  = ''
+DWH_IAM_ROLE_NAME       = ''
 
 # Cluster Database Details
-HOST                   = config.get("CLUSTER", "HOST")
-DB_NAME                = config.get("CLUSTER","DB_NAME")
-DB_USER                = config.get("CLUSTER","DB_USER")
-DB_PASSWORD            = config.get("CLUSTER","DB_PASSWORD")
-DB_PORT                = config.get("CLUSTER","DB_PORT")
+HOST                    = ''
+DB_NAME                 = ''
+DB_USER                 = ''
+DB_PASSWORD             = ''
+DB_PORT                 = ''
 
-def create_aws_resource(name, region):
+ec2                     = ''
+s3                      = ''
+iam                     = ''
+redshift                = ''
+roleArn                 = ''
+
+async def init_datawarehouse_params():
     """
-    Creates an AWS resource, e.g., ec2, s3.
-    
-    :param str name - the name of the resource
-    :param str region - the name of the AWS region that will contain the resource.
+    Loads datawarehouse credentials that are required to
+    provision the computing resource in AWS Redshift datawarehouse.
+    Also, the credentials allows the project to interact with
+    the databases in the Redshift clusters.
 
-    :return - the AWS resource
-
-    :raises UnknownServiceError - if the name is an invalid AWS resource name
+    open the configuration file so that the credntials values
+    can be extracted to initialize the corresponding variables
     """
-    try:
-        resource = boto3.resource(
-            name,
-            region_name=region,
-            aws_access_key_id=KEY,
-            aws_secret_access_key=SECRET
-        )
-    except Exception as e:
-        print("Error: Issues creating the aws resource")
-        raise(e)
-    return resource
+        
+    config = configparser.ConfigParser()
+    config.read_file(open('dwh.cfg'))
 
-def create_aws_client(name, region):
-    """
-    Creates an AWS client, e.g., ima, redshift.
-    
-    :param str name - the name of the client
-    :param str region - the name of the AWS region that will contain the client.
+    print("Loading datawarehouse parameter values")
+    # Access Keys
+    KEY                    = config.get('AWS','KEY')
+    SECRET                 = config.get('AWS','SECRET')
 
-    :return - the AWS client
-    """
+    # Cluster Details
+    DWH_CLUSTER_TYPE       = config.get("DWH","DWH_CLUSTER_TYPE")
+    DWH_NUM_NODES          = config.get("DWH","DWH_NUM_NODES")
+    DWH_NODE_TYPE          = config.get("DWH","DWH_NODE_TYPE")
+    DWH_CLUSTER_IDENTIFIER = config.get("DWH","DWH_CLUSTER_IDENTIFIER")
+    DWH_IAM_ROLE_NAME      = config.get("DWH", "DWH_IAM_ROLE_NAME")
 
-    try:
-        client = boto3.client(
-            name,
-            region_name=region,
-            aws_access_key_id=KEY,
-            aws_secret_access_key=SECRET
-        ) 
-    except Exception as e:
-        print("Error: Issues creating the aws client")
-        raise(e)
+    # Cluster Database Details
+    HOST                   = config.get("CLUSTER", "HOST")
+    DB_NAME                = config.get("CLUSTER","DB_NAME")
+    DB_USER                = config.get("CLUSTER","DB_USER")
+    DB_PASSWORD            = config.get("CLUSTER","DB_PASSWORD")
+    DB_PORT                = config.get("CLUSTER","DB_PORT")
 
-    return client
+    print("Done Loading datawarehouse parameter values")
 
-# Create different aws resources and clients
-ec2 = create_aws_resource('ec2', 'us-west-2')
-s3 = create_aws_resource('s3', 'us-west-2')
-iam = create_aws_client('iam', 'us-west-2')
-redshift = create_aws_client('redshift', 'us-west-2')
+    print("Creating ec2, s3, iam, and reshift clients")
+    # Create ec2 and s3 aws resources
+    ec2 = create_aws_resource('ec2', 'us-west-2', KEY, SECRET)
+    s3 = create_aws_resource('s3', 'us-west-2', KEY, SECRET)
 
-def create_iam_role():
-    """
-    Create an IAM Role that makes Redshift able to access S3 bucket (ReadOnly)
-    """
-    #1.1 Create the role, 
-    try:
-        print("1.1 Creating a new IAM Role") 
-        dwhRole = iam.create_role(
-            Path='/',
-            RoleName=DWH_IAM_ROLE_NAME,
-            Description = "Allows Redshift clusters to call AWS services on your behalf.",
-            AssumeRolePolicyDocument=json.dumps(
-                {'Statement': [{'Action': 'sts:AssumeRole',
-                'Effect': 'Allow',
-                'Principal': {'Service': 'redshift.amazonaws.com'}}],
-                'Version': '2012-10-17'})
-        )    
-    except Exception as e:
-        print("Error: Issues creating iam role")
-        print(e)        
-    
-    
-    print("1.2 Attaching Policy")
-    iam.attach_role_policy(
-        RoleName=DWH_IAM_ROLE_NAME,
-        PolicyArn="arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess"
-    )['ResponseMetadata']['HTTPStatusCode']
+    #Create iam andredshift aws clients
+    iam = create_aws_client('iam', 'us-west-2', KEY, SECRET)
+    redshift = create_aws_client('redshift', 'us-west-2', KEY, SECRET)
+    print("Done creating ec2, s3, iam, and reshift clients")
 
-    print("1.3 Get the IAM role ARN")
-    roleArn = iam.get_role(RoleName=DWH_IAM_ROLE_NAME)['Role']['Arn']
+    # create iam role
+    print("Creating IAM role")
+    roleArn = create_iam_role(iam, DWH_IAM_ROLE_NAME)
+    print("Done creating IAM role")
 
-    print(roleArn)
-
-    return roleArn
-
-# create iam role
-roleArn = create_iam_role()
-
-def create_redshift_cluster():
+async def create_redshift_cluster():
     """
     Creates a redshift cluster that will be used as the cloud dataware to host
     the databses that powers the data analysis
@@ -150,16 +108,20 @@ def create_redshift_cluster():
         print("Error: Issues creating redshift cluster")
         print(e)
 
-def getClusterDetails():
+async def get_cluster_details():
     """
     Retrieves the cluster details after the cluster status becomes available
     """
+    count = 1
     # describe redshift properties to if ClusterStatus is avaiable
+    print('{}: check if the cluster is available'.format(count))
     myClusterProps = redshift.describe_clusters(ClusterIdentifier=DWH_CLUSTER_IDENTIFIER)['Clusters'][0]
 
     # Wait until the cluster status becomes available
     while myClusterProps['ClusterStatus'] != 'available':
         sleep(3)
+        count += 1
+        print('{}: check if the cluster is available'.format(count))
         myClusterProps = redshift.describe_clusters(ClusterIdentifier=DWH_CLUSTER_IDENTIFIER)['Clusters'][0]
         
     # Take note of the cluster endpoint and role ARN
@@ -196,3 +158,25 @@ def getClusterDetails():
         print("Error: Could not get cursor to the Clsuter Database")
         print(e)
     connect.set_session(autocommit=True)
+    print("Successfully connected to the redshift")
+
+async def provosion_resources():
+    """
+    Schedules calls to provision the aws resources
+    """
+    print(f"started provisioning of datawarehouse resources")
+
+    # Initialize datawarehouse parameter values
+    await init_datawarehouse_params()
+
+    # Create redshift cluster
+    print("Creating redshift cluster")
+    await create_redshift_cluster()
+    print("After called to creating redshift cluster")
+
+    # Get redshift cluster
+    print("get the cluster details")
+    await get_cluster_details()
+    print("Done getting the cluster details")
+
+asyncio.run(provosion_resources())
