@@ -10,7 +10,7 @@ As their data engineer, you are tasked with building an ETL pipeline that extrac
 ![AWS S3 to Redshift ETL ARchitecture](https://user-images.githubusercontent.com/24963911/217428418-7a836be4-809f-46db-8f51-6c33b92f37a0.png)
 
 ## Project Dataset
-As shown in the image above, there are three datasets in S3 (Song, log, and log_json datasets), which are required to extract, transform, and then load into Redshift. 
+As shown in the image above, there are three datasets in S3 (Song, log, and log_json_path datasets), which are required to extract, transform, and then load into Redshift. 
 
 ### Song Dataset
 The first dataset is a subset of real data from the [Million Song Dataset](http://millionsongdataset.com/). Each file is in JSON format and contains metadata about a song and the artist of that song. The files are partitioned by the first three letters of each song's track ID. For example, here are file paths to two files in this dataset.
