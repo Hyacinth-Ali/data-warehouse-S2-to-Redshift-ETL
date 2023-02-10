@@ -5,12 +5,16 @@ config = configparser.ConfigParser()
 config.read('dwh.cfg')
 
 # Load datawarehouse parameter values
-KEY = config.get("AWS", "KEY")
-SECRET = config.get("AWS", "SECRET")
-DWH_CLUSTER_IDENTIFIER = config.get("DWH","DWH_CLUSTER_IDENTIFIER")
-DWH_IAM_ROLE_NAME = config.get("DWH","DWH_IAM_ROLE_NAME")
+KEY                     = config.get("AWS", "KEY")
+SECRET                  = config.get("AWS", "SECRET")
+DWH_CLUSTER_IDENTIFIER  = config.get("DWH","DWH_CLUSTER_IDENTIFIER")
+DWH_IAM_ROLE_NAME       = config.get("DWH","DWH_IAM_ROLE_NAME")
 
-ARN = config.get("IAM_ROLE", "ARN")
+ARN                     = config.get("IAM_ROLE", "ARN")
+
+LOG_DATA                = config.get("S3", "LOG_DATA")
+LOG_JSONPATH            = config.get("S3", "LOG_JSONPATH")
+SONG_DATA               = config.get("S3", "SONG_DATA")
 
 # DROP TABLE QUERIES
 
@@ -155,20 +159,20 @@ time_table_create = ("""
 # JSON keys 
 #copy staging event datasets
 staging_events_copy = ("""
-    COPY staging_events_table FROM 's3://udacity-dend/log_data'
+    COPY staging_events_table FROM '{}'
     CREDENTIALS 'aws_iam_role={}'
     REGION 'us-west-2'
-    json 's3://udacity-dend/log_json_path.json'
+    json '{}'
     dateformat 'auto';
-""").format(ARN)
+""").format(LOG_DATA, ARN, LOG_JSONPATH)
 
 #copy staging song data datasets
 staging_songs_copy = ("""
-    COPY staging_songs_table FROM 's3://udacity-dend/song_data'
+    COPY staging_songs_table FROM '{}'
     CREDENTIALS 'aws_iam_role={}'
     REGION 'us-west-2'
     json 'auto';
-""").format(ARN)
+""").format(SONG_DATA, ARN)
 
 
 # FINAL TABLES

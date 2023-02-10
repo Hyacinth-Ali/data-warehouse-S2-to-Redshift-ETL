@@ -92,8 +92,8 @@ def validate_redshift():
             ToPort=int(DB_PORT)
         )
     except Exception as e:
-        print("Error: Issues opnening TCP port")
-        print(e)
+        print("Error: TCP port already exist")
+        # print(e)
 
     # Validate connection to the redshift cluster
     try: 
@@ -110,6 +110,7 @@ def validate_redshift():
         print(e)
     connect.set_session(autocommit=True)
     print("Successfully connected to the redshift")
+    return connect
 
 
 
