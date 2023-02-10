@@ -53,4 +53,6 @@ The content of the third dataset, which contains meta information about the log 
 
 ## Project Steps
 There are three main steps to design and then implement this project.
-1. Provision computing resources with ***Infrasctructure as Code*** paradigm
+1. Provision computing resources with **Infrasctructure as Code** paradigm.
+2. Create tables based on **Star Schema** approach.
+3. Build the ETL pipeline
