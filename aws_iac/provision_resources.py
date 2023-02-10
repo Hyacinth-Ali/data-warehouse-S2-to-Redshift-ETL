@@ -1,8 +1,5 @@
-import asyncio
 from time import sleep
 import pandas as pd
-import boto3
-import json
 import psycopg2
 import configparser
 
@@ -105,10 +102,18 @@ class ProvisonResource(object):
         ProvisonResource.INSTANCE.redshift = create_aws_client('redshift', 'us-west-2', ProvisonResource.INSTANCE.KEY, ProvisonResource.INSTANCE.SECRET)
         print("Done creating ec2, s3, iam, and reshift clients")
 
-        # create iam role
-        print("Creating IAM role")
-        ProvisonResource.INSTANCE.roleArn = create_iam_role(ProvisonResource.INSTANCE.iam, ProvisonResource.INSTANCE.DWH_IAM_ROLE_NAME)
-        print("Done creating IAM role")
+    def get_iam_role_arn():
+        # get iam client
+        iam = ProvisonResource.INSTANCE.iam
+        iam_role_name = ProvisonResource.INSTANCE.DWH_IAM_ROLE_NAME
+        try:
+            roleArn = iam.get_role(RoleName=iam_role_name)['Role']['Arn']
+        except Exception as e:
+            # create iam role arn since it doesn't exist
+            print("Creating IAM role")
+            roleArn = create_iam_role(iam, iam_role_name)
+            print("Done creating IAM role")
+        return roleArn
  
     def create_redshift_cluster(provision_resource):
         """
@@ -116,6 +121,7 @@ class ProvisonResource(object):
         the databses that powers the data analysis
         """
         try:
+            role_arn = ProvisonResource.get_iam_role_arn()
             response = provision_resource.redshift.create_cluster(        
                 #Hardware
                 ClusterType=provision_resource.DWH_CLUSTER_TYPE,
@@ -129,11 +135,12 @@ class ProvisonResource(object):
                 MasterUserPassword=provision_resource.DB_PASSWORD,
             
                 #Roles (for s3 access)
-                IamRoles=[provision_resource.roleArn]  
+                IamRoles=[role_arn]  
             )
         except Exception as e:
             print("Error: Issues creating redshift cluster")
             print(e)
+            raise(e)
 
     def get_cluster_details(provision_resource):
         """
@@ -199,7 +206,7 @@ class ProvisonResource(object):
         # Create redshift cluster
         print("Creating redshift cluster")
         ProvisonResource.create_redshift_cluster(provision_resource)
-        print("After called to creating redshift cluster")
+        print("After called to create redshift cluster")
 
         # Get redshift cluster
         print("get the cluster details")
