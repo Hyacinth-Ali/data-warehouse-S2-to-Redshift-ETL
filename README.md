@@ -1,6 +1,5 @@
 # Data Warehouse (S3 to AWS Redshift ETL)
-This is an ETL (Extract, Transform, Load) data pipeline project, which leverages AWS services (S3 and Redshift) to build a data warehouse for a startup company. 
-
+This is an ETL (Extract, Transform, Load) data pipeline project, which leverages AWS services (S3 and Redshift) to build a data warehouse for a startup company.  Go [here](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/README.md#implementation-steps-and-how-to-run-the-project) if you just want to run the project, and for step by step (with code) implementation of this project, visit this [page](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb)
 
 ## Problem Statement
 A music streaming startup, Sparkify, has grown their user base and song database and want to move their processes and data onto the cloud. Their data resides in S3, in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.
@@ -51,8 +50,31 @@ The content of the third dataset, which contains meta information about the log 
 
 ![Log Json Path](https://user-images.githubusercontent.com/24963911/217435680-a5f90d3c-b6ee-4ad2-82a2-c684572c7173.png)
 
-## Project Steps
-There are three main steps to design and then implement this project.
-1. Provision computing resources with **Infrasctructure as Code** paradigm.
-2. Create tables based on **Star Schema** approach.
-3. Build the ETL pipeline
+
+## Implementation Steps and How to Run the Project
+Clone the project and then follow the steps below at the root directory (data-warehouse-s3-to-redshift-etl) to run the project.
+1. **Provision Computing Resources**: Create different AWS computing resources, with **Infrasctructure as Code** paradigm, that are required to implement this project, including the redshift cluster.
+```
+python provision_resources.py 
+```
+2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables. The final tables are based on **Star Schema** approach, as depicted below.
+![Final Tables Schema](https://user-images.githubusercontent.com/24963911/218272966-10eb8712-f653-4dd2-bfc8-6a1e214737e9.png)
+
+
+**Run this scriot to create the tables**
+```
+python create_tables.py 
+```
+3. **Insert Data into the Tables**: Insert data into the tables by copying datasets from S3 to staging tables, and finally inserting datasets from the staging tables to the final tables.
+```
+python etl.py 
+```
+4. **Run Exploratory Analysis**: At this juncture, the datasets sit in redshift cluster ready to be explored to provide insights into the music startup company.
+```
+python explore.py 
+```
+5. **Tear Down the Resoources**: Delete the resources for this project on AWS
+```
+python teardown.py
+```
+For more details about the results of these steps, visit this [page](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb) to see both the code and the corresponding output of each command.
