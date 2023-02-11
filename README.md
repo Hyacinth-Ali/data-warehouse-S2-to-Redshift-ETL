@@ -59,11 +59,11 @@ There are three main steps to design and then implement this project.
 
 ## How to Run the Project
 Clone the project and then follow the steps below at the root directory (data-warehouse-s3-to-redshift-etl) to run the project.
-1. **Provision Computing Resources**: Create different AWS computing resources that are required to implement this project, including the redshift cluster.
+1. **Provision Computing Resources**: Create different AWS computing resources, with **Infrasctructure as Code** paradigm, that are required to implement this project, including the redshift cluster.
 ```
 python provision_resources.py 
 ```
-2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables.
+2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables. The final tables are based on **Star Schema** approach, as depicted below.
 ```
 python create_tables.py 
 ```
