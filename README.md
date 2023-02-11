@@ -1,6 +1,5 @@
 # Data Warehouse (S3 to AWS Redshift ETL)
-This is an ETL (Extract, Transform, Load) data pipeline project, which leverages AWS services (S3 and Redshift) to build a data warehouse for a startup company. 
-
+This is an ETL (Extract, Transform, Load) data pipeline project, which leverages AWS services (S3 and Redshift) to build a data warehouse for a startup company.  For step by step (with code) implementation of this project, visit this [page](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb)
 
 ## Problem Statement
 A music streaming startup, Sparkify, has grown their user base and song database and want to move their processes and data onto the cloud. Their data resides in S3, in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.
@@ -59,7 +58,7 @@ Clone the project and then follow the steps below at the root directory (data-wa
 python provision_resources.py 
 ```
 2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables. The final tables are based on **Star Schema** approach, as depicted below.
-![Final Tables Schema](https://user-images.githubusercontent.com/24963911/218265171-e9209a46-c1bf-4e9b-ba21-b17469927dab.png)
+![Final Tables Schema](https://user-images.githubusercontent.com/24963911/218272966-10eb8712-f653-4dd2-bfc8-6a1e214737e9.png)
 
 
 **Run this scriot to create the tables**
