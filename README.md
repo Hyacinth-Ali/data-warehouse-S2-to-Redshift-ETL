@@ -51,11 +51,6 @@ The content of the third dataset, which contains meta information about the log 
 
 ![Log Json Path](https://user-images.githubusercontent.com/24963911/217435680-a5f90d3c-b6ee-4ad2-82a2-c684572c7173.png)
 
-## Project Steps
-There are three main steps to design and then implement this project.
-1. Provision computing resources with **Infrasctructure as Code** paradigm.
-2. Create tables based on **Star Schema** approach.
-3. Build the ETL pipeline
 
 ## How to Run the Project
 Clone the project and then follow the steps below at the root directory (data-warehouse-s3-to-redshift-etl) to run the project.
@@ -64,6 +59,8 @@ Clone the project and then follow the steps below at the root directory (data-wa
 python provision_resources.py 
 ```
 2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables. The final tables are based on **Star Schema** approach, as depicted below.
+![Final Tables Schema](https://user-images.githubusercontent.com/24963911/218265171-e9209a46-c1bf-4e9b-ba21-b17469927dab.png)
+**Run this scriot to create the tables**
 ```
 python create_tables.py 
 ```
