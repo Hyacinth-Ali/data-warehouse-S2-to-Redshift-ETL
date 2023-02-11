@@ -84,7 +84,6 @@ staging_songs_table_create = ("""
 """)
 
 # CREATE FACT - song play
-
 # Create song play query
 songplay_table_create = ("""
     CREATE TABLE IF NOT EXISTS songplay_table
@@ -102,12 +101,12 @@ songplay_table_create = ("""
 """)
 
 # CREATE DIMENSIONAL TABLES - user, song, artist, and time tables
-
 # Create User Table
 user_table_create = ("""
     CREATE TABLE IF NOT EXISTS user_table
     (
-        user_id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        user_id INT4,
         first_name TEXT,
         last_name TEXT,
         gender TEXT,
@@ -119,7 +118,8 @@ user_table_create = ("""
 song_table_create = ("""
     CREATE TABLE IF NOT EXISTS song_table
     (
-        song_id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        song_id TEXT,
         title TEXT,
         artist_id TEXT,
         year INT4,
@@ -131,7 +131,8 @@ song_table_create = ("""
 artist_table_create = ("""
     CREATE TABLE IF NOT EXISTS artist_table
     (
-        artist_id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        id INT4 IDENTITY(0, 1) NOT NULL PRIMARY KEY,
+        artist_id TEXT,
         name TEXT,
         location TEXT,
         latitude float,
@@ -200,8 +201,9 @@ songplay_table_insert = ("""
 
 # insert data into user table
 user_table_insert = ("""
-    INSERT INTO user_table (first_name, last_name, gender, level)
+    INSERT INTO user_table (user_id, first_name, last_name, gender, level)
     SELECT DISTINCT
+        userId as user_id,
         firstName AS first_name,
         lastName AS last_name,
         gender,
@@ -211,8 +213,9 @@ user_table_insert = ("""
 
 # insert data into song table
 song_table_insert = ("""
-    INSERT INTO song_table (title, artist_id, year, duration)
+    INSERT INTO song_table (song_id, title, artist_id, year, duration)
     SELECT DISTINCT
+        song_id,
         title,
         artist_id,
         year,
@@ -222,13 +225,18 @@ song_table_insert = ("""
 
 # Insert data into artist table
 artist_table_insert = ("""
-    INSERT INTO artist_table (name, location, latitude, longitude)
+    INSERT INTO artist_table (artist_id, name, location, latitude, longitude)
     SELECT DISTINCT
+        artist_id,
         artist_name AS name,
         artist_location AS location,
         artist_latitude AS latitude,
         artist_longitude AS longitude
-    FROM staging_songs_table;
+    FROM staging_songs_table s
+    JOIN staging_events_table e
+    ON (e.artist = s.artist_name)
+    AND (e.length = s.duration)
+    AND (e.song = s.title)
 """)
 
 # insert data into time table
