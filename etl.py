@@ -32,9 +32,11 @@ def main():
     
     print("Loading staging datasets . . .")
     load_staging_tables(cur, conn)
+    print("Done loading the datasets")
 
-    print("Inserting data to final database . . .")
+    print("Inserting data to final datable . . .")
     insert_tables(cur, conn)
+    print("Done inserting data to the final datables")
 
     conn.close()
 
