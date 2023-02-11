@@ -56,3 +56,27 @@ There are three main steps to design and then implement this project.
 1. Provision computing resources with **Infrasctructure as Code** paradigm.
 2. Create tables based on **Star Schema** approach.
 3. Build the ETL pipeline
+
+## How to Run the Project
+Clone the project and then follow the steps below at the root directory (data-warehouse-s3-to-redshift-etl) to run the project.
+1. **Provision Computing Resources**: Create different AWS computing resources that are required to implement this project, including the redshift cluster.
+```
+python provision_resources.py 
+```
+2. **Create Tables**: Create tables in the redshift cluster to contain the datasets from AWS S3, i.e., staging tables and final tables.
+```
+python create_tables.py 
+```
+3. **Insert Data into the Tables**: Isert data into the tables by copying datasets from S3 to staging tables, and finally inserting datasets from the staging tables to the final tables.
+```
+python etl.py 
+```
+4. **Run Exploratory Analysis**: At this juncture, the datasets sit in redshift cluster ready to be explored to provide insights into the music startup company.
+```
+python explore.py 
+```
+5. **Tear Down the Resoources**: Delete the resources for this project on AWS
+```
+python teardown.py
+```
+For more details about the results of these steps, visit this [page](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb) to see both the code and the corresponding output of each command.
