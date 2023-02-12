@@ -1,6 +1,8 @@
 # Data Warehouse (S3 to AWS Redshift ETL)
 This is an ETL (Extract, Transform, Load) data pipeline project, which leverages AWS services (S3 and Redshift) to build a data warehouse for a startup company.  Go [here](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/README.md#implementation-steps-and-how-to-run-the-project) if you just want to run the project, and for step by step (with code) implementation of this project, visit this [page](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb)
 
+**Note** that you are required to create a file (dwh.cfg) at the root directory of this project and then populate it with the required parameter values. More details [here](https://github.com/Hyacinth-Ali/data-warehouse-S3-to-Redshift-ETL/blob/master/redshift_cluster.ipynb)
+
 ## Problem Statement
 A music streaming startup, Sparkify, has grown their user base and song database and want to move their processes and data onto the cloud. Their data resides in S3, in a directory of JSON logs on user activity on the app, as well as a directory with JSON metadata on the songs in their app.
 
